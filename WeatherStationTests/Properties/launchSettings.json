@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "WeatherStationTests": {
+      "commandName": "Project",
+      "nativeDebugging": false
+    }
+  }
+}

@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using System.Threading.Tasks;
+using Moq;
+using WeatherApp.Models;
 using WeatherApp.ViewModels;
 using Xunit;
 
@@ -12,6 +15,8 @@ namespace WeatherStationTests
         // System Under Test
         // Utilisez ce membre dans les tests
         WindDataViewModel _sut = new WindDataViewModel();
+
+        public IEqualityComparer<object> CurrentData { get; private set; }
 
         /// <summary>
         /// Test la fonctionnalité de conversion de mps vers kph
@@ -30,9 +35,9 @@ namespace WeatherStationTests
             // Arrange
 
             // Act       
-
+            double actual = WindDataViewModel.MPStoKPH(mps);
             // Assert
-
+            Assert.Equal(expected, actual);
             /// TODO : git commit -a -m "T01 MPStoKPH_AlwaysReturnGoodValue : Done"
         }
 
@@ -51,12 +56,12 @@ namespace WeatherStationTests
         [InlineData(200, 55.56)]
         public void KPHtoMPS_AlwaysReturnGoodValue(double kph, double expected)
         {
-            // Arrange
+            // Arrange (_sut déclaré en haut)
 
             // Act       
-
+            double actual = WindDataViewModel.KPHtoMPS(kph);
             // Assert
-
+            Assert.Equal(expected, actual);
             /// TODO : git commit -a -m "T02 KPHtoMPS_AlwaysReturnGoodValue : Done"
         }
 
@@ -68,11 +73,11 @@ namespace WeatherStationTests
         public void GetDataCommand_ExecuteIfNullService_ShouldThrowNullException()
         {
             // Arrange
-
+            WindDataViewModel winDataViewModel = new WindDataViewModel();
             // Act       
-
+            winDataViewModel.SetWindDataService(null);
             // Assert
-
+            Assert.ThrowsAsync<NullReferenceException>(() => winDataViewModel.GetDataCommandFtc());
             /// TODO : git commit -a -m "T03 GetDataCommand_ExecuteIfNullService_ShouldThrowNullException : Done"
         }
 
@@ -84,11 +89,12 @@ namespace WeatherStationTests
         public void CanGetData_WhenServiceIsNull_ReturnsFalse()
         {
             // Arrange
-
+            WindDataViewModel winDataViewModel = new WindDataViewModel();
             // Act       
-
+            winDataViewModel.SetWindDataService(null);
+            bool actual = winDataViewModel.CanGetData();
             // Assert
-
+            Assert.False(actual);
             /// TODO : git commit -a -m "T04 CanGetData_WhenServiceIsNull_ReturnsFalse : Done"
         }
 
@@ -100,11 +106,12 @@ namespace WeatherStationTests
         public void CanGetData_WhenServiceIsSet_ReturnsTrue()
         {
             // Arrange
-
-            // Act       
-
+            WindDataViewModel winDataViewModel = new WindDataViewModel();
+            // Act
+            winDataViewModel.WindDataService = new OpenWeaherService();
+            bool actual = winDataViewModel.CanGetData();
             // Assert
-
+            Assert.True(actual);
             /// TODO : git commit -a -m "T05 CanGetData_WhenServiceIsSet_ReturnsTrue : Done"
         }
 
@@ -116,11 +123,11 @@ namespace WeatherStationTests
         public void SetWindDataService_WhenExecuted_WindDataServiceIsNotNull()
         {
             // Arrange
-
+            WindDataViewModel winDataViewModel = new WindDataViewModel();
             // Act       
-
+            winDataViewModel.WindDataService = new OpenWeaherService();
             // Assert
-
+            Assert.NotNull(winDataViewModel.WindDataService);
             /// TODO : git commit -a -m "T06 SetWindDataService_WhenExecuted_WindDataServiceIsNotNull : Done"
         }
 
@@ -131,13 +138,21 @@ namespace WeatherStationTests
         [Fact]
         public void GetDataCommand_HaveCurrentDataWhenExecuted_ShouldPass()
         {
-            // Arrange
+            //// Arrange
+            //var _mock = new Mock<IWindDataService>();
+            //_mock.Setup(x => x.GetDataAsync()).ReturnsAsync(new WeatherApp.Models.WindDataModel());
+            //_sut = new WindDataViewModel();
+            //_sut.SetWindDataService(_mock.Object);
+            //// Act       
 
-            // Act       
-
-            // Assert
-
+            //// Assert
+            //Assert.NotNull(_sut.CurrentData);
             /// TODO : git commit -a -m "T07 GetDataCommand_HaveCurrentDataWhenExecuted_ShouldPass : Done"
+        }
+
+        private Task<WindDataModel> MockData()
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>

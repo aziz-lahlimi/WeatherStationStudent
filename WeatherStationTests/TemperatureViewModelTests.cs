@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using Moq;
+using WeatherApp.Services;
 using WeatherApp.ViewModels;
 using Xunit;
 
@@ -29,10 +31,13 @@ namespace WeatherStationTests
         public void CelsiusInFahrenheit_AlwaysReturnGoodValue(double C, double expected)
         {
             // Arrange
+            _sut = new TemperatureViewModel();
 
-            // Act       
+            // Act
+            double actual = _sut.CelsiusInFahrenheit(C);
 
             // Assert
+            Assert.Equal(expected, actual, 1);
 
             /// xTODO : git commit -a -m "T01 CelsisInFahrenheit_AlwaysReturnGoodValue : Done"
         }
@@ -53,10 +58,13 @@ namespace WeatherStationTests
         public void FahrenheitInCelsius_AlwaysReturnGoodValue(double F, double expected)
         {
             // Arrange
+            TemperatureViewModel _sut = new TemperatureViewModel();
 
-            // Act       
+            // Act
+            double actual = _sut.FahrenheitInCelsius(F);
 
             // Assert
+            Assert.Equal(expected, actual, 1);
 
             /// xTODO : git commit -a -m "T02 FahrenheitInCelsius_AlwaysReturnGoodValue : Done"
         }
@@ -69,11 +77,11 @@ namespace WeatherStationTests
         public void GetTempCommand_ExecuteIfNullService_ShouldThrowNullException()
         {
             // Arrange
-
+            TemperatureViewModel _sut = new TemperatureViewModel();
             // Act       
 
             // Assert
-
+            Assert.Throws<NullReferenceException>(() => _sut.GetTempCommand.Execute(string.Empty));
             /// xTODO : git commit -a -m "T03 GetTempCommand_ExecuteIfNullService_ShouldThrowNullException : Done"
         }
 
@@ -85,11 +93,11 @@ namespace WeatherStationTests
         public void CanGetTemp_WhenServiceIsNull_ReturnsFalse()
         {
             // Arrange
-
+            TemperatureViewModel _sut = new TemperatureViewModel();
             // Act       
-
+            var actual = _sut.CanGetTemp(string.Empty);
             // Assert
-
+            Assert.False(actual);
             /// xTODO : git commit -a -m "T04 CanGetTemp_WhenServiceIsNull_ReturnsFalse : Done"
         }
 
@@ -101,11 +109,14 @@ namespace WeatherStationTests
         public void CanGetTemp_WhenServiceIsSet_ReturnsTrue()
         {
             // Arrange
-
-            // Act       
-
-            // Assert
-
+            //var _mock = new Mock<ITemoeratureService>();
+            //_sut = new TemperatureViewModel();
+            //_sut.SetTemperatureService((ITemperatureService)_mock.Object);
+            
+            ////// Act       
+            //var actual = _sut.CanGetTemp(string.Empty);
+            ////// Assert
+            //Assert.True(actual);
             /// xTODO : git commit -a -m "T05 CanGetTemp_WhenServiceIsSet_ReturnsTrue : Done"
         }
 
@@ -117,11 +128,13 @@ namespace WeatherStationTests
         public void SetTemperatureService_WhenExecuted_TemperatureServiceIsNotNull()
         {
             // Arrange
-
+            var _mock = new Mock<ITemperatureService>();
+            _sut = new TemperatureViewModel();
+            _sut.SetTemperatureService(_mock.Object);
             // Act       
-
+            var actual = _sut.TemperatureService != null;
             // Assert
-
+            Assert.True(actual);
             /// xTODO : git commit -a -m "T06 SetTemperatureService_WhenExecuted_TemperatureServiceIsNotNull : Done"
         }
 
@@ -133,11 +146,14 @@ namespace WeatherStationTests
         public void GetTempCommand_HaveCurrentTempWhenExecuted_ShouldPass()
         {
             // Arrange
-
+            var _mock = new Mock<ITemperatureService>();
+            _mock.Setup(x => x.GetTempAsync()).ReturnsAsync(new WeatherApp.Models.TemperatureModel());
+            _sut = new TemperatureViewModel();
+            _sut.SetTemperatureService(_mock.Object);
             // Act       
-
+            _sut.GetTempCommand.Execute(string.Empty);
             // Assert
-
+            Assert.NotNull(_sut.CurrentTemp);
             /// xTODO : git commit -a -m "T07 GetTempCommand_HaveCurrentTempWhenExecuted_ShouldPass : Done"
         }
 
